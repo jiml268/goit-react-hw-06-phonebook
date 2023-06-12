@@ -1,44 +1,35 @@
 import React from 'react';
 import css from './ContactForm.module.css';
-import { useState } from 'react';
 import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { addContact } from 'redux/contactSlice';
 
-export const ContactForm = ({ addContact }) => {
-  const [state, setState] = useState({
-    name: '',
-    number: '',
-  });
+export const ContactForm = () => {
+  const dispatch = useDispatch();
 
   const handleSubmit = e => {
     e.preventDefault();
-    const { name, number } = state;
-    const newContact = {
-      id: nanoid(),
-      name,
-      number,
-    };
-    addContact(newContact);
-    setState({ name: '', number: '' });
-  };
 
-  const onChange = e => {
-    setState(prevState => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
+    const newObj = {
+      id: nanoid(),
+      name: e.target.elements.name.value,
+      number: e.target.elements.number.value,
+    };
+    dispatch(addContact(newObj));
+
+    e.target.reset();
   };
 
   return (
-    <form className={css.form} onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className={css.form} >
       <label className={(css.formName)}>
         Name
         <input
           className={(css.inputName, css.formInput)}
-          onChange={onChange}
-          value={state.name}
+    
           type="text"
           name="name"
+          placeholder="Name"
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan."
           required
@@ -48,8 +39,7 @@ export const ContactForm = ({ addContact }) => {
         Number
         <input
           className={(css.inputNum, css.formInput)}
-          onChange={onChange}
-          value={state.number}
+           placeholder="Phone number"
           type="tel"
           name="number"
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
@@ -64,6 +54,3 @@ export const ContactForm = ({ addContact }) => {
   );
 };
 
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
-};
